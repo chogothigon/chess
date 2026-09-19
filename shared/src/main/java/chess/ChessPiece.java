@@ -152,7 +152,6 @@ public class ChessPiece {
         int[] captureDirections = {-1, 1};
 
         for (int dir : captureDirections) {
-
             int newTargetRow = row + direction;
             int newTargetCol = col + dir;
 
@@ -287,7 +286,6 @@ public class ChessPiece {
                 rookMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
-
 
         return validMoves;
     }
