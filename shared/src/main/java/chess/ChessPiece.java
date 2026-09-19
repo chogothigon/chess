@@ -92,18 +92,14 @@ public class ChessPiece {
     }
 
     public static void knightMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        for (int i = 1; i < 8; i++) {
-            int newTargetRow = row + (i * rowDir);
-            int newTargetCol = col + (i * colDir);
+        int newTargetRow = row + (rowDir);
+        int newTargetCol = col + (colDir);
 
-            if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
-                break;
-            }
-
-            if (targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol)) {
-                break;
-            }
+        if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
+            return;
         }
+
+        targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol);
     }
 
     public static void pawnMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
@@ -176,6 +172,16 @@ public class ChessPiece {
                 {-1, 0},
                 {0, -1}
         };
+        int[][] knightDirectionsArray = {
+                {2, 1},
+                {2, -1},
+                {-2, 1},
+                {-2, -1},
+                {1, 2},
+                {1, -2},
+                {-1, 2},
+                {-1, -2}
+        };
 
         if (piece.getPieceType() == null) {
             return validMoves;
@@ -201,7 +207,7 @@ public class ChessPiece {
             }
         }
         else if (piece.getPieceType() == PieceType.KNIGHT) {
-            for (int[] dir : diagonalDirectionsArray) {
+            for (int[] dir : knightDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
                 knightMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
