@@ -47,8 +47,22 @@ public class ChessPiece {
         return type;
     }
 
-    public static void targetMovement () {
+    public static boolean targetMovement (ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int newTargetRow, int newTargetCol) {
+        ChessPosition newTargetPos = new ChessPosition(newTargetRow, newTargetCol);
+        ChessPiece piece = board.getPiece(myPosition);
+        ChessPiece targetPiece = board.getPiece(newTargetPos);
 
+        if (targetPiece == null) {
+            validMoves.add(new ChessMove(myPosition, newTargetPos, null));
+            return false;
+        }
+        else if (targetPiece.getTeamColor() != piece.getTeamColor()) {
+            validMoves.add(new ChessMove(myPosition, newTargetPos, null));
+            return true;
+        }
+        else {
+            return true;
+        }
     }
 
     public static void bishopMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
@@ -60,23 +74,22 @@ public class ChessPiece {
                 break;
             }
 
-            ChessPosition newTargetPos = new ChessPosition(newTargetRow, newTargetCol);
-            ChessPiece piece = board.getPiece(myPosition);
-            ChessPiece targetPiece = board.getPiece(newTargetPos);
-
-            if (targetPiece == null) {
-                validMoves.add(new ChessMove(myPosition, newTargetPos, null));
-            }
-            else if (targetPiece.getTeamColor() != piece.getTeamColor()) {
-                validMoves.add(new ChessMove(myPosition, newTargetPos, null));
-                break;
-            }
-            else {
+            if (targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol)) {
                 break;
             }
         }
     }
 
+    public static void kingMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
+        int newTargetRow = row + (rowDir);
+        int newTargetCol = col + (colDir);
+
+        if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
+            return;
+        }
+
+        targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol);
+    }
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -91,20 +104,43 @@ public class ChessPiece {
         int col = myPosition.getColumn();
         List<ChessMove> validMoves = new ArrayList<>();
 
-        int[][] directionsArray = {
+        int[][] diagonalDirectionsArray = {
                 {1, 1},
                 {1, -1},
                 {-1, 1},
                 {-1, -1}
         };
+        int[][] straightDirectionsArray = {
+                {0, 1},
+                {1, 0},
+                {-1, 0},
+                {0, -1}
+        };
+
+        if (piece.getPieceType() == null) {
+            return validMoves;
+        }
 
         if (piece.getPieceType() == PieceType.BISHOP) {
-            for (int[] dir : directionsArray) {
+            for (int[] dir : diagonalDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
                 bishopMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
+        else if (piece.getPieceType() == PieceType.KING) {
+            for (int[] dir : diagonalDirectionsArray) {
+                int rowDir = dir[0];
+                int colDir = dir[1];
+                kingMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+            }
+            for (int[] dir : straightDirectionsArray) {
+                int rowDir = dir[0];
+                int colDir = dir[1];
+                kingMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+            }
+        }
+
 
         return validMoves;
     }
