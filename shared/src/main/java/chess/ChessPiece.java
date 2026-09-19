@@ -47,6 +47,27 @@ public class ChessPiece {
         return type;
     }
 
+    public static void bishopMovement(ChessPiece piece, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col) {
+        if (piece.getPieceType() == PieceType.BISHOP) {
+
+            for (int i = 1; i < 8; i++) {
+                if (row + i <= 8 && col + i <= 8) {
+                    validMoves.add(new ChessMove(myPosition, new ChessPosition(row + i, col + i), null));
+                }
+                if (row + i <= 8 && col - i >= 1) {
+                    validMoves.add(new ChessMove(myPosition, new ChessPosition(row + i, col - i), null));
+                }
+                if (row - i >= 1 && col + i <= 8) {
+                    validMoves.add(new ChessMove(myPosition, new ChessPosition(row - i, col + i), null));
+                }
+                if (row - i >= 1 && col - i >= 1) {
+                    validMoves.add(new ChessMove(myPosition, new ChessPosition(row - i, col - i), null));
+                }
+            }
+        }
+    }
+
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -56,27 +77,12 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        int rowVal = myPosition.getRow();
-        int colVal = myPosition.getColumn();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
         List<ChessMove> validMoves = new ArrayList<>();
 
-        if (piece.getPieceType() == PieceType.BISHOP) {
 
-            for (int i = 1; i < 8; i++) {
-                if (rowVal + i <= 8 && colVal + i <= 8) {
-                    validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal + i, colVal + i), null));
-                }
-                if (rowVal + i <= 8 && colVal - i >= 1) {
-                    validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal + i, colVal - i), null));
-                }
-                if (rowVal - i >= 1 && colVal + i <= 8) {
-                    validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal - i, colVal + i), null));
-                }
-                if (rowVal - i >= 1 && colVal - i >= 1) {
-                    validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal - i, colVal - i), null));
-                }
-            }
-        }
+        bishopMovement(piece, myPosition, validMoves, row, col);
         return validMoves;
     }
 
