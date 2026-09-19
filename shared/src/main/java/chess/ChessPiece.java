@@ -102,17 +102,69 @@ public class ChessPiece {
         targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol);
     }
 
-    public static void pawnMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        for (int i = 1; i < 8; i++) {
-            int newTargetRow = row + (i * rowDir);
-            int newTargetCol = col + (i * colDir);
+    public static void addPawnMove(ChessPosition myPosition, ChessPosition targetPosition, List<ChessMove> validMoves, int promotionRow) {
+        if (targetPosition.getRow() == promotionRow) {
+            validMoves.add(new ChessMove(myPosition, targetPosition, PieceType.QUEEN));
+            validMoves.add(new ChessMove(myPosition, targetPosition, PieceType.ROOK));
+            validMoves.add(new ChessMove(myPosition, targetPosition, PieceType.BISHOP));
+            validMoves.add(new ChessMove(myPosition, targetPosition, PieceType.KNIGHT));
+        }
+        else {
+            validMoves.add(new ChessMove(myPosition, targetPosition, null));
+        }
+    }
+
+    public static void pawnMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col) {
+        ChessPiece piece = board.getPiece(myPosition);
+        int direction;
+        int startingRow;
+        int promotionRow;
+
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            direction = 1;
+            startingRow = 2;
+            promotionRow = 8;
+        }
+        else {
+            direction = -1;
+            startingRow = 7;
+            promotionRow = 1;
+        }
+
+        int forwardRow = row + direction;
+
+        if (forwardRow >= 1 && forwardRow <= 8) {
+            ChessPosition forwardPosition = new ChessPosition(forwardRow, col);
+            if (board.getPiece(forwardPosition) == null) {
+                addPawnMove(myPosition, forwardPosition, validMoves, promotionRow);
+
+                if (row == startingRow) {
+                    int doubleRow = row + (2 * direction);
+                    ChessPosition doublePosition = new ChessPosition(doubleRow, col);
+
+                    if (board.getPiece(doublePosition) == null) {
+                        validMoves.add(new ChessMove(myPosition, doublePosition,null));
+                    }
+                }
+            }
+        }
+
+        int[] captureDirections = {-1, 1};
+
+        for (int dir : captureDirections) {
+
+            int newTargetRow = row + direction;
+            int newTargetCol = col + dir;
 
             if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
-                break;
+                continue;
             }
 
-            if (targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol)) {
-                break;
+            ChessPosition newTargetPos = new ChessPosition(newTargetRow, newTargetCol);
+            ChessPiece targetPiece = board.getPiece(newTargetPos);
+
+            if (targetPiece != null && targetPiece.getTeamColor() != piece.getTeamColor()) {
+                addPawnMove(myPosition, newTargetPos, validMoves, promotionRow);
             }
         }
     }
@@ -214,11 +266,7 @@ public class ChessPiece {
             }
         }
         else if (piece.getPieceType() == PieceType.PAWN) {
-            for (int[] dir : diagonalDirectionsArray) {
-                int rowDir = dir[0];
-                int colDir = dir[1];
-                pawnMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
-            }
+            pawnMovement(board, myPosition, validMoves, row, col);
         }
         else if (piece.getPieceType() == PieceType.QUEEN) {
             for (int[] dir : diagonalDirectionsArray) {
