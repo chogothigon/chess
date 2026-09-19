@@ -55,23 +55,23 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        int rowVal = myPosition.getRow;
-        int colVal = myPosition.getCol;
+        int rowVal = myPosition.getRow();
+        int colVal = myPosition.getColumn();
         List<ChessMove> validMoves = new ArrayList<>();
 
         if (piece.getPieceType() == PieceType.BISHOP) {
 
             for (int i = 1; i < 8; i++) {
-                if (rowVal + i !> 8 && colVal + i !> 8) {
+                if (rowVal + i <= 8 && colVal + i <= 8) {
                     validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal + i, colVal + i), null));
                 }
-                if (rowVal + i !> 8 && colVal - i !< 1) {
+                if (rowVal + i <= 8 && colVal - i >= 1) {
                     validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal + i, colVal - i), null));
                 }
-                if (rowVal - i !< 1 && colVal + i !> 8) {
+                if (rowVal - i >= 1 && colVal + i <= 8) {
                     validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal - i, colVal + i), null));
                 }
-                if (rowVal - i !< 1 && colVal - i !< 1) {
+                if (rowVal - i >= 1 && colVal - i >= 1) {
                     validMoves.add(new ChessMove(myPosition, new ChessPosition(rowVal - i, colVal - i), null));
                 }
             }
