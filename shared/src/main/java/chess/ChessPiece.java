@@ -169,7 +169,7 @@ public class ChessPiece {
     }
 
     public static void queenMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             int newTargetRow = row + (i * rowDir);
             int newTargetCol = col + (i * colDir);
 
