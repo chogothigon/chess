@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -73,11 +74,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (!file.exists()) {
-            // Signal the caller that something went wrong
-            throw new FileNotFoundException("Could not find " + location);
-        }
-
         throw new RuntimeException("Not implemented");
     }
 
