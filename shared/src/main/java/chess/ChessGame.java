@@ -96,7 +96,7 @@ public class ChessGame {
 
         Collection<ChessMove> moves = validMoves(startPosition);
 
-        if (moves == null) {
+        if (moves == null  || !moves.contains(move)) {
             throw new InvalidMoveException();
         }
 
@@ -180,7 +180,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = validMoves(position);
 
-                    if (moves != null) {
+                    if (moves != null  && !moves.isEmpty()) {
                         return false;
                     }
                 }
@@ -210,7 +210,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = validMoves(position);
 
-                    if (moves != null) {
+                    if (moves != null  && !moves.isEmpty()) {
                         return false;
                     }
                 }
@@ -238,5 +238,17 @@ public class ChessGame {
         return this.board;
     }
 
-a
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return currentTeamTurn == chessGame.currentTeamTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTeamTurn, board);
+    }
 }
