@@ -14,11 +14,15 @@ public class ChessGame {
 
     private TeamColor currentTeamTurn;
     private ChessBoard board;
+    private ChessPosition whiteKingPosition;
+    private ChessPosition blackKingPosition;
 
     public ChessGame() {
         this.currentTeamTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
         this.board.resetBoard();
+        whiteKingPosition = new ChessPosition(1, 5);
+        blackKingPosition = new ChessPosition(8, 5);
     }
 
     /**
@@ -77,6 +81,24 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    private ChessPosition getKingPosition(TeamColor teamColor) {
+        if (teamColor == TeamColor.WHITE) {
+            return whiteKingPosition;
+        }
+        else {
+            return blackKingPosition;
+        }
+    }
+
+    private void setKingPosition(TeamColor teamColor, ChessPosition position) {
+        if (teamColor == TeamColor.WHITE) {
+            whiteKingPosition = position;
+        }
+        else {
+            blackKingPosition = position;
+        }
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -84,7 +106,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
