@@ -14,6 +14,13 @@ public class ChessGame {
 
     private TeamColor currentTeamTurn;
     private ChessBoard board;
+    private ChessMove lastMove;
+    private boolean whiteKingMoved = false;
+    private boolean blackKingMoved = false;
+    private boolean whiteLeftRookMoved = false;
+    private boolean whiteRightRookMoved = false;
+    private boolean blackLeftRookMoved = false;
+    private boolean blackRightRookMoved = false;
 
     public ChessGame() {
         this.currentTeamTurn = TeamColor.WHITE;
@@ -45,6 +52,35 @@ public class ChessGame {
         BLACK
     }
 
+    private void getEnPassantMove(ChessPosition startPosition, Collection<ChessMove> possibleMoves) {
+        ChessPiece pawn = board.getPiece(startPosition);
+
+        if (lastMove == null) {
+            return;
+        }
+
+        ChessPosition lastStart = lastMove.getStartPosition();
+        ChessPosition lastEnd = lastMove.getEndPosition();
+        ChessPiece lastPiece = board.getPiece(lastEnd);
+
+        if (lastPiece.getPieceType() != ChessPiece.PieceType.PAWN || lastPiece.getTeamColor() == pawn.getTeamColor()) {
+            return;
+        }
+
+        if (Math.abs(lastStart.getRow() - lastEnd.getRow()) != 2) {
+            return;
+        }
+
+        if (lastEnd.getRow() != startPosition.getRow() || Math.abs(lastEnd.getColumn() - startPosition.getColumn()) != 1) {
+            return;
+        }
+
+        int direction = pawn.getTeamColor() == TeamColor.WHITE ? 1 : -1;
+        ChessPosition endPosition = new ChessPosition(startPosition.getRow() + direction, lastEnd.getColumn());
+        ChessMove enPassantMove = new ChessMove(startPosition, endPosition, null);
+        possibleMoves.add(enPassantMove);
+    }
+
     /**
      * Gets all valid moves for a piece at the given location
      *
@@ -59,12 +95,26 @@ public class ChessGame {
             return null;
         }
 
-        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> possibleMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
+
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            getEnPassantMove(startPosition, possibleMoves);
+        }
+
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         for (ChessMove move : possibleMoves) {
             ChessPosition endPosition = move.getEndPosition();
             ChessPiece capturedPiece = board.getPiece(endPosition);
+            ChessPosition enPassantPosition = null;
+            ChessPiece enPassantPiece = null;
+
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && startPosition.getColumn() != endPosition.getColumn() && capturedPiece == null) {
+                enPassantPosition = new ChessPosition(startPosition.getRow(), endPosition.getColumn());
+                enPassantPiece = board.getPiece(enPassantPosition);
+                board.addPiece(enPassantPosition, null);
+            }
+
             board.addPiece(startPosition, null);
             board.addPiece(endPosition, piece);
 
@@ -74,6 +124,10 @@ public class ChessGame {
 
             board.addPiece(startPosition, piece);
             board.addPiece(endPosition, capturedPiece);
+
+            if (enPassantPosition != null) {
+                board.addPiece(enPassantPosition, enPassantPiece);
+            }
         }
 
         return validMoves;
@@ -110,8 +164,13 @@ public class ChessGame {
             movedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
 
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && startPosition.getColumn() != endPosition.getColumn() && board.getPiece(endPosition) == null) {
+            ChessPosition capturedPawnPosition = new ChessPosition(startPosition.getRow(), endPosition.getColumn());
+            board.addPiece(capturedPawnPosition, null);
+        }
         board.addPiece(endPosition, movedPiece);
         board.addPiece(startPosition, null);
+        lastMove = move;
         currentTeamTurn = (currentTeamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
