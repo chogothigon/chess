@@ -8,8 +8,19 @@ public class MemoryAuthDAO implements AuthDAO{
 
     private final Map<String, AuthData> auths = new HashMap<>();
 
-    void createAuth(AuthData auth) throws DataAccessException;
-    AuthData getAuth(String authToken) throws DataAccessException;
-    void deleteAuth(String authToken) throws DataAccessException;
-    void clear() throws DataAccessException;
+    public void createAuth(AuthData auth) {
+        auths.put(auth.authToken(), auth);
+    }
+
+    public AuthData getAuth(String authToken) {
+        return auths.get(authToken);
+    }
+
+    public void deleteAuth(String authToken) {
+        auths.remove(authToken);
+    }
+
+    public void clear() {
+        auths.clear();
+    };
 }
