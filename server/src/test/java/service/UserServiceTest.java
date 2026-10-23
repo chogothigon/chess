@@ -92,4 +92,30 @@ class UserServiceTest {
 
         assertEquals(400, exception.toHttpStatusCode());
     }
+
+    @Test
+    void logout() throws DataAccessException, ResponseException {
+        var user = new UserData("ryan", "password", "ryan@email.com");
+        var auth = service.register(user);
+
+        service.logout(auth.authToken());
+
+        assertNull(authDAO.getAuth(auth.authToken()));
+    }
+
+    @Test
+    void logoutInvalidToken() {
+        var exception = assertThrows(ResponseException.class,
+                () -> service.logout("invalidToken"));
+
+        assertEquals(401, exception.toHttpStatusCode());
+    }
+
+    @Test
+    void logoutMissingToken() {
+        var exception = assertThrows(ResponseException.class,
+                () -> service.logout(null));
+
+        assertEquals(401, exception.toHttpStatusCode());
+    }
 }

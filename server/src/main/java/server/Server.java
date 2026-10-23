@@ -28,6 +28,7 @@ public class Server {
                 .delete("/db", this::clear)
                 .post("/user", this::register)
                 .post("/session", this::login)
+                .delete("/session", this::logout)
                 .exception(ResponseException.class, this::responseError)
                 .exception(DataAccessException.class, this::dataAccessError);
     }
@@ -67,6 +68,14 @@ public class Server {
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result(gson.toJson(auth));
+    }
+
+    private void logout(Context ctx) throws DataAccessException, ResponseException {
+        String authToken = ctx.header("authorization");
+        userService.logout(authToken);
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result("{}");
     }
 
     private void responseError(ResponseException ex, Context ctx) {

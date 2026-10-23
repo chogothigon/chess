@@ -36,7 +36,7 @@ public class UserService {
 
         UserData existingUser = userDAO.getUser(user.username());
 
-        if (existingUser == null) {
+        if (existingUser == null || !existingUser.password().equals(user.password())) {
             throw new ResponseException(401, "Error: unauthorized");
         }
 
@@ -45,4 +45,13 @@ public class UserService {
         authDAO.createAuth(auth);
         return auth;
     }
+
+    public void logout(String authToken) throws DataAccessException, ResponseException {
+        if (authToken == null || authDAO.getAuth(authToken) == null) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+
+        authDAO.deleteAuth(authToken);
+    }
+
 }
