@@ -9,6 +9,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.*;
 import service.*;
+
 import java.util.Map;
 
 public class Server {

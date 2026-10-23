@@ -3,7 +3,9 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
+
 import java.util.Collection;
+
 import chess.ChessGame;
 
 public class GameService {
@@ -61,8 +63,7 @@ public class GameService {
                 throw new ResponseException(403, "Error: already taken");
             }
             white = auth.username();
-        }
-        else {
+        } else {
             if (black != null) {
                 throw new ResponseException(403, "Error: already taken");
             }

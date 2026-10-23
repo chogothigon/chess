@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.*;
 import model.*;
+
 import java.util.UUID;
 
 public class UserService {
@@ -53,5 +54,4 @@ public class UserService {
 
         authDAO.deleteAuth(authToken);
     }
-
 }
