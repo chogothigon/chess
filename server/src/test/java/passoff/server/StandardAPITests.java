@@ -93,7 +93,7 @@ public class StandardAPITests {
     @Order(4)
     @DisplayName("Login Unauthorized (Multiple Forms)")
     public void loginUnauthorized() {
-        TestUser[] unauthorizedLoginRequests = {newUser, new TestUser(existingUser.getUsername(), "BAD!PASSWORD")};
+        TestUser[] unauthorizedLoginRequests = { newUser, new TestUser(existingUser.getUsername(), "BAD!PASSWORD") };
 
         for (TestUser unauthorizedLoginRequest : unauthorizedLoginRequests) {
             TestAuthResult loginResult = serverFacade.login(unauthorizedLoginRequest);
@@ -243,7 +243,7 @@ public class StandardAPITests {
         int gameID = createResult.getGameID();
 
         //If you use deserialize to the TeamColor enum instead of a String each of these will be read as null
-        for (String color : new String[]{null, "", "GREEN"}) {
+        for(String color : new String[]{null, "", "GREEN"}) {
             assertHttpBadRequest(serverFacade.joinPlayer(new TestJoinRequest(color, gameID), existingAuth));
         }
     }
@@ -378,7 +378,7 @@ public class StandardAPITests {
     @Test
     @Order(21)
     @DisplayName("Authtokens Valid Individually")
-    public void uniqueAuthorizationTokensAllWork() {
+    public void uniqueAuthorizationTokensAllWork(){
         TestAuthResult loginOne = serverFacade.login(existingUser);
         assertHttpOk(loginOne);
         Assertions.assertNotNull(loginOne.getAuthToken(), "Login result did not contain an authToken");

@@ -96,7 +96,7 @@ class UserServiceTest {
 
     @Test
     void logout() throws DataAccessException, ResponseException {
-        var user = new UserData("ryan", "password", "ryan@email.com");
+        var user = new UserData("ryan", "password", "test@email.com");
         var auth = service.register(user);
 
         service.logout(auth.authToken());
