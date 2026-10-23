@@ -35,6 +35,7 @@ public class Server {
                 .delete("/session", this::logout)
                 .get("/game", this::listGames)
                 .post("/game", this::createGame)
+                .put("/game", this::joinGame)
                 .exception(ResponseException.class, this::responseError)
                 .exception(DataAccessException.class, this::dataAccessError);
     }
@@ -120,6 +121,32 @@ public class Server {
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result(gson.toJson(result));
+    }
+
+    private void joinGame(Context ctx) throws DataAccessException, ResponseException {
+        try {
+            JsonObject request = gson.fromJson(ctx.body(), JsonObject.class);
+
+            if (request == null ||
+                    !request.has("gameID") ||
+                    !request.has("playerColor") ||
+                    !request.get("gameID").isJsonPrimitive() ||
+                    !request.get("gameID").getAsJsonPrimitive().isNumber() ||
+                    !request.get("playerColor").isJsonPrimitive() ||
+                    !request.get("playerColor").getAsJsonPrimitive().isString()) {
+                throw new ResponseException(400, "Error: bad request");
+            }
+
+            int gameID = Integer.parseInt(request.get("gameID").getAsString());
+            String playerColor = request.get("playerColor").getAsString();
+            gameService.joinGame(ctx.header("authorization"), gameID, playerColor);
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result("{}");
+
+        } catch (JsonParseException | IllegalStateException | NumberFormatException e) {
+            throw new ResponseException(400, "Error: bad request");
+        }
     }
 
     private void responseError(ResponseException ex, Context ctx) {

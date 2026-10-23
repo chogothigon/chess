@@ -82,4 +82,89 @@ class GameServiceTest {
         var exception = assertThrows(ResponseException.class, () -> service.listGames(null));
         assertEquals(401, exception.toHttpStatusCode());
     }
+
+    @Test
+    void joinGameWhite() throws DataAccessException, ResponseException {
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        service.joinGame("token123", game.gameID(), "WHITE");
+
+        var updated = gameDAO.getGame(game.gameID());
+
+        assertEquals("ryan", updated.whiteUsername());
+        assertNull(updated.blackUsername());
+    }
+
+    @Test
+    void joinGameBlack() throws DataAccessException, ResponseException {
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        service.joinGame("token123", game.gameID(), "BLACK");
+
+        var updated = gameDAO.getGame(game.gameID());
+
+        assertEquals("ryan", updated.blackUsername());
+        assertNull(updated.whiteUsername());
+    }
+
+    @Test
+    void joinGameColorTaken() throws DataAccessException, ResponseException {
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        service.joinGame("token123", game.gameID(), "WHITE");
+
+        var exception = assertThrows(ResponseException.class,
+                () -> service.joinGame("token123", game.gameID(), "WHITE"));
+
+        assertEquals(403, exception.toHttpStatusCode());
+    }
+
+    @Test
+    void joinGameInvalidID() {
+        var exception = assertThrows(ResponseException.class,
+                () -> service.joinGame("token123", 999, "WHITE"));
+
+        assertEquals(400, exception.toHttpStatusCode());
+    }
+
+    @Test
+    void joinGameInvalidColor() throws DataAccessException, ResponseException {
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        var exception = assertThrows(ResponseException.class,
+                () -> service.joinGame("token123", game.gameID(), "GREEN"));
+
+        assertEquals(400, exception.toHttpStatusCode());
+    }
+
+    @Test
+    void joinGameInvalidToken() throws DataAccessException, ResponseException {
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        var exception = assertThrows(ResponseException.class,
+                () -> service.joinGame("invalidToken", game.gameID(), "WHITE"));
+
+        assertEquals(401, exception.toHttpStatusCode());
+    }
+
+    @Test
+    void joinGameBothPlayers() throws DataAccessException, ResponseException {
+        authDAO.createAuth(new AuthData("token456", "alex"));
+
+        var game = service.createGame("token123",
+                new GameData(0, null, null, "Test Game", null));
+
+        service.joinGame("token123", game.gameID(), "WHITE");
+        service.joinGame("token456", game.gameID(), "BLACK");
+
+        var updated = gameDAO.getGame(game.gameID());
+
+        assertEquals("ryan", updated.whiteUsername());
+        assertEquals("alex", updated.blackUsername());
+    }
 }

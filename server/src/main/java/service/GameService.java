@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import model.AuthData;
 import model.GameData;
 import java.util.Collection;
 import chess.ChessGame;
@@ -33,5 +34,42 @@ public class GameService {
         }
 
         return gameDAO.listGames();
+    }
+
+    public void joinGame(String authToken, int gameID, String playerColor) throws DataAccessException, ResponseException {
+        if (gameID <= 0 || (!"WHITE".equals(playerColor) && !"BLACK".equals(playerColor))) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+        AuthData auth = authDAO.getAuth(authToken);
+
+        if (auth == null) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+
+        GameData game = gameDAO.getGame(gameID);
+
+        if (game == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+        String white = game.whiteUsername();
+        String black = game.blackUsername();
+
+        if (playerColor.equals("WHITE")) {
+            if (white != null) {
+                throw new ResponseException(403, "Error: already taken");
+            }
+            white = auth.username();
+        }
+        else {
+            if (black != null) {
+                throw new ResponseException(403, "Error: already taken");
+            }
+            black = auth.username();
+        }
+
+        GameData updatedGame = new GameData(game.gameID(), white, black, game.gameName(), game.game());
+        gameDAO.updateGame(updatedGame);
     }
 }
