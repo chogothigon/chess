@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTest {
-    static final GameDAO gameDAO = new MemoryGameDAO();
-    static final AuthDAO authDAO = new MemoryAuthDAO();
-    static final GameService service = new GameService(gameDAO, authDAO);
+    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final GameService service = new GameService(gameDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {

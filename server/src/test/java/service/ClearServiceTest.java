@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClearServiceTest {
-    static final UserDAO userDAO = new MemoryUserDAO();
-    static final AuthDAO authDAO = new MemoryAuthDAO();
-    static final GameDAO gameDAO = new MemoryGameDAO();
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final GameDAO gameDAO = new MemoryGameDAO();
 
-    static final ClearService service = new ClearService(userDAO, authDAO, gameDAO);
+    private final ClearService service = new ClearService(userDAO, authDAO, gameDAO);
 
     @BeforeEach
     void setup() throws DataAccessException {

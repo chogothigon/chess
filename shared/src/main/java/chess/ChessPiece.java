@@ -47,7 +47,8 @@ public class ChessPiece {
         return type;
     }
 
-    public static boolean targetMovement (ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int newTargetRow, int newTargetCol) {
+    public static boolean targetMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves,
+                                          int newTargetRow, int newTargetCol) {
         ChessPosition newTargetPos = new ChessPosition(newTargetRow, newTargetCol);
         ChessPiece piece = board.getPiece(myPosition);
         ChessPiece targetPiece = board.getPiece(newTargetPos);

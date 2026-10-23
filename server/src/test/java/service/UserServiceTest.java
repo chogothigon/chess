@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
-    static final UserDAO userDAO = new MemoryUserDAO();
-    static final AuthDAO authDAO = new MemoryAuthDAO();
-    static final UserService service = new UserService(userDAO, authDAO);
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final UserService service = new UserService(userDAO, authDAO);
 
     @BeforeEach
     void clear() throws DataAccessException {

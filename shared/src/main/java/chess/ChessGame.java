@@ -143,13 +143,21 @@ public class ChessGame {
 
         boolean rightRookMoved = team == TeamColor.WHITE ? whiteRightRookMoved : blackRightRookMoved;
 
-        if (!rightRookMoved && board.getPiece(new ChessPosition(row, 6)) == null && board.getPiece(new ChessPosition(row, 7)) == null && !isSquareAttacked(new ChessPosition(row, 6), enemyTeam) && !isSquareAttacked(new ChessPosition(row, 7), enemyTeam)) {
+        if (!rightRookMoved && board.getPiece(new ChessPosition(row, 6)) == null
+                && board.getPiece(new ChessPosition(row, 7)) == null
+                && !isSquareAttacked(new ChessPosition(row, 6), enemyTeam)
+                && !isSquareAttacked(new ChessPosition(row, 7), enemyTeam)) {
             possibleMoves.add(new ChessMove(startPosition, new ChessPosition(row, 7), null));
         }
 
         boolean leftRookMoved = team == TeamColor.WHITE ? whiteLeftRookMoved : blackLeftRookMoved;
 
-        if (!leftRookMoved && board.getPiece(new ChessPosition(row, 2)) == null && board.getPiece(new ChessPosition(row, 3)) == null && board.getPiece(new ChessPosition(row, 4)) == null && !isSquareAttacked(new ChessPosition(row, 4), enemyTeam) && !isSquareAttacked(new ChessPosition(row, 3), enemyTeam)) {
+        if (!leftRookMoved
+                && board.getPiece(new ChessPosition(row, 2)) == null
+                && board.getPiece(new ChessPosition(row, 3)) == null
+                && board.getPiece(new ChessPosition(row, 4)) == null
+                && !isSquareAttacked(new ChessPosition(row, 4), enemyTeam)
+                && !isSquareAttacked(new ChessPosition(row, 3), enemyTeam)) {
             possibleMoves.add(new ChessMove(startPosition, new ChessPosition(row, 3), null));
         }
     }
@@ -285,7 +293,9 @@ public class ChessGame {
             movedPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
 
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && startPosition.getColumn() != endPosition.getColumn() && board.getPiece(endPosition) == null) {
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN
+                && startPosition.getColumn() != endPosition.getColumn()
+                && board.getPiece(endPosition) == null) {
             ChessPosition capturedPawnPosition = new ChessPosition(startPosition.getRow(), endPosition.getColumn());
             board.addPiece(capturedPawnPosition, null);
         }
