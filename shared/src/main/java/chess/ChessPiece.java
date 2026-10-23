@@ -65,7 +65,7 @@ public class ChessPiece {
         }
     }
 
-    public static void bishopMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
+    public static void multiMove(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
         for (int i = 1; i < 8; i++) {
             int newTargetRow = row + (i * rowDir);
             int newTargetCol = col + (i * colDir);
@@ -80,20 +80,9 @@ public class ChessPiece {
         }
     }
 
-    public static void kingMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        int newTargetRow = row + (rowDir);
-        int newTargetCol = col + (colDir);
-
-        if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
-            return;
-        }
-
-        targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol);
-    }
-
-    public static void knightMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        int newTargetRow = row + (rowDir);
-        int newTargetCol = col + (colDir);
+    public static void singleMove(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
+        int newTargetRow = row + rowDir;
+        int newTargetCol = col + colDir;
 
         if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
             return;
@@ -168,36 +157,6 @@ public class ChessPiece {
         }
     }
 
-    public static void queenMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        for (int i = 1; i <= 8; i++) {
-            int newTargetRow = row + (i * rowDir);
-            int newTargetCol = col + (i * colDir);
-
-            if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
-                break;
-            }
-
-            if (targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol)) {
-                break;
-            }
-        }
-    }
-
-    public static void rookMovement(ChessBoard board, ChessPosition myPosition, List<ChessMove> validMoves, int row, int col, int rowDir, int colDir) {
-        for (int i = 1; i < 8; i++) {
-            int newTargetRow = row + (i * rowDir);
-            int newTargetCol = col + (i * colDir);
-
-            if (newTargetRow < 1 || newTargetRow > 8 || newTargetCol < 1 || newTargetCol > 8) {
-                break;
-            }
-
-            if (targetMovement(board, myPosition, validMoves, newTargetRow, newTargetCol)) {
-                break;
-            }
-        }
-    }
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -242,26 +201,26 @@ public class ChessPiece {
             for (int[] dir : diagonalDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                bishopMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                multiMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
         else if (piece.getPieceType() == PieceType.KING) {
             for (int[] dir : diagonalDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                kingMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                singleMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
             for (int[] dir : straightDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                kingMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                singleMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
         else if (piece.getPieceType() == PieceType.KNIGHT) {
             for (int[] dir : knightDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                knightMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                singleMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
         else if (piece.getPieceType() == PieceType.PAWN) {
@@ -271,19 +230,19 @@ public class ChessPiece {
             for (int[] dir : diagonalDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                queenMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                multiMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
             for (int[] dir : straightDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                queenMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                multiMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
         else if (piece.getPieceType() == PieceType.ROOK) {
             for (int[] dir : straightDirectionsArray) {
                 int rowDir = dir[0];
                 int colDir = dir[1];
-                rookMovement(board, myPosition, validMoves, row, col, rowDir, colDir);
+                multiMove(board, myPosition, validMoves, row, col, rowDir, colDir);
             }
         }
 
