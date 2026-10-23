@@ -1,6 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dataaccess.*;
 import io.javalin.Javalin;
@@ -19,16 +21,20 @@ public class Server {
 
     private final ClearService clearService;
     private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         userService = new UserService(userDAO, authDAO);
+        gameService = new GameService(gameDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .delete("/db", this::clear)
                 .post("/user", this::register)
                 .post("/session", this::login)
                 .delete("/session", this::logout)
+                .get("/game", this::listGames)
+                .post("/game", this::createGame)
                 .exception(ResponseException.class, this::responseError)
                 .exception(DataAccessException.class, this::dataAccessError);
     }
@@ -76,6 +82,44 @@ public class Server {
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result("{}");
+    }
+
+    private void createGame(Context ctx) throws DataAccessException, ResponseException {
+        String authToken = ctx.header("authorization");
+        GameData game;
+
+        try {
+            game = gson.fromJson(ctx.body(), GameData.class);
+        } catch (JsonParseException e) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+        GameData result = gameService.createGame(authToken, game);
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(gson.toJson(Map.of("gameID", result.gameID())));
+    }
+
+    private void listGames(Context ctx) throws DataAccessException, ResponseException {
+        String authToken = ctx.header("authorization");
+        var games = gameService.listGames(authToken);
+        JsonArray gameList = new JsonArray();
+
+        for (GameData game : games) {
+            JsonObject gameJson = new JsonObject();
+            gameJson.addProperty("gameID", game.gameID());
+            gameJson.add("whiteUsername", gson.toJsonTree(game.whiteUsername()));
+            gameJson.add("blackUsername", gson.toJsonTree(game.blackUsername()));
+            gameJson.addProperty("gameName", game.gameName());
+            gameList.add(gameJson);
+        }
+
+        JsonObject result = new JsonObject();
+        result.add("games", gameList);
+
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(gson.toJson(result));
     }
 
     private void responseError(ResponseException ex, Context ctx) {

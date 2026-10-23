@@ -26,7 +26,10 @@ public class MemoryGameDAO implements GameDAO{
         return new ArrayList<>(games.values());
     }
 
-    public void updateGame(GameData game) {
+    public void updateGame(GameData game) throws DataAccessException {
+        if (!games.containsKey(game.gameID())) {
+            throw new DataAccessException("Game does not exist");
+        }
         games.put(game.gameID(), game);
     }
 
