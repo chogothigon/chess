@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.sql.SQLDatabase;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -25,6 +26,13 @@ public class Server {
     }
 
     public Server(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
+        try {
+            SQLDatabase.configureDatabase();
+            System.out.println("Database initialized");
+        } catch (DataAccessException ex) {
+            throw new RuntimeException("Unable to configure database", ex);
+        }
+
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);

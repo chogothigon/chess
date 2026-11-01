@@ -43,7 +43,7 @@ public class SQLDatabase {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Unable to configure database", ex);
+            throw new DataAccessException("Unable to configure the database", ex);
         }
     }
 }
