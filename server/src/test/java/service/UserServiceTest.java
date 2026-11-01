@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.mindrot.jbcrypt.BCrypt;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,11 +23,12 @@ class UserServiceTest {
     void register() throws DataAccessException, ResponseException {
         var user = new UserData("ryan", "password", "test@gmail.com");
         var result = service.register(user);
+        var storedUser = userDAO.getUser("ryan");
 
-        assertEquals("ryan", result.username());
-        assertNotNull(result.authToken());
-        assertEquals(user, userDAO.getUser("ryan"));
-        assertEquals(result, authDAO.getAuth(result.authToken()));
+        assertEquals(user.username(), storedUser.username());
+        assertEquals(user.email(), storedUser.email());
+        assertNotEquals(user.password(), storedUser.password());
+        assertTrue(BCrypt.checkpw(user.password(), storedUser.password()));
     }
 
     @Test
@@ -52,7 +54,8 @@ class UserServiceTest {
 
     @Test
     void login() throws DataAccessException, ResponseException {
-        userDAO.createUser(new UserData("ryan", "password", "test@gmail.com"));
+        String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        userDAO.createUser(new UserData("ryan", hashedPassword, "test@gmail.com"));
 
         var user = new UserData("ryan", "password", null);
         var result = service.login(user);
@@ -64,7 +67,8 @@ class UserServiceTest {
 
     @Test
     void loginWrongPassword() throws DataAccessException {
-        userDAO.createUser(new UserData("ryan", "password", "test@gmail.com"));
+        String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+        userDAO.createUser(new UserData("ryan", hashedPassword, "test@gmail.com"));
 
         var user = new UserData("ryan", "wrongpassword", null);
 
