@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.*;
 import model.*;
-
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.UUID;
 
 public class UserService {
@@ -23,7 +23,10 @@ public class UserService {
             throw new ResponseException(403, "Error: already taken");
         }
 
-        userDAO.createUser(user);
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        UserData storedUser = new UserData(user.username(), hashedPassword, user.email());
+        userDAO.createUser(storedUser);
+
         String token = UUID.randomUUID().toString();
         AuthData auth = new AuthData(token, user.username());
         authDAO.createAuth(auth);
@@ -37,10 +40,9 @@ public class UserService {
 
         UserData existingUser = userDAO.getUser(user.username());
 
-        if (existingUser == null || !existingUser.password().equals(user.password())) {
+        if (existingUser == null || !BCrypt.checkpw(user.password(), existingUser.password())) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-
         String token = UUID.randomUUID().toString();
         AuthData auth = new AuthData(token, user.username());
         authDAO.createAuth(auth);
