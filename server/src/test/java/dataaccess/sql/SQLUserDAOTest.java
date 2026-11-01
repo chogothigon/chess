@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SqlUserDAOTest {
+class SQLUserDAOTest {
     static final UserDAO userDAO = new SQLUserDAO();
 
     @BeforeEach
