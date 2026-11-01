@@ -10,6 +10,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import model.*;
 import service.*;
+import dataaccess.sql.*;
 
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class Server {
     private final GameService gameService;
 
     public Server() {
-        this(new MemoryUserDAO(), new MemoryAuthDAO(), new MemoryGameDAO());
+        this(new SQLUserDAO(), new SQLAuthDAO(), new SQLGameDAO());
     }
 
     public Server(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
