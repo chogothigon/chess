@@ -8,6 +8,9 @@ import dataaccess.*;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SQLGameDAOTest {
@@ -116,4 +119,46 @@ class SQLGameDAOTest {
         assertEquals(chessGame.getTeamTurn(), stored.game().getTeamTurn());
     }
 
+
+    @Test
+    void databaseErrors() throws Exception {
+        var properties = new Properties();
+
+        try (var stream = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+            assertNotNull(stream);
+            properties.load(stream);
+        }
+
+        var load = DatabaseManager.class.getDeclaredMethod("loadProperties", Properties.class);
+        var reset = DatabaseManager.class.getDeclaredMethod("loadPropertiesFromResources");
+
+        load.setAccessible(true);
+        reset.setAccessible(true);
+
+        properties.setProperty("db.name", "information_schema");
+
+        try {
+            load.invoke(null, properties);
+
+            var userDAO = new SQLUserDAO();
+            var authDAO = new SQLAuthDAO();
+            var game = new GameData(1, null, null, "Test Game", new ChessGame());
+
+            assertThrows(DataAccessException.class, () -> userDAO.getUser("test"));
+            assertThrows(DataAccessException.class, userDAO::clear);
+
+            assertThrows(DataAccessException.class, () -> authDAO.getAuth("token123"));
+            assertThrows(DataAccessException.class, () -> authDAO.deleteAuth("token123"));
+            assertThrows(DataAccessException.class, authDAO::clear);
+
+            assertThrows(DataAccessException.class, () -> gameDAO.createGame(game));
+            assertThrows(DataAccessException.class, () -> gameDAO.getGame(1));
+            assertThrows(DataAccessException.class, gameDAO::listGames);
+            assertThrows(DataAccessException.class, () -> gameDAO.updateGame(game));
+            assertThrows(DataAccessException.class, gameDAO::clear);
+
+        } finally {
+            reset.invoke(null);
+        }
+    }
 }

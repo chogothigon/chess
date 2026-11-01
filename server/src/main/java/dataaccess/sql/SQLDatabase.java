@@ -5,7 +5,7 @@ import java.sql.*;
 
 public class SQLDatabase {
 
-    private static final String[] createStatements = {
+    private static final String[] CREATE_STATEMENTS = {
             """
             CREATE TABLE IF NOT EXISTS users (
                 username VARCHAR(256) NOT NULL,
@@ -37,7 +37,7 @@ public class SQLDatabase {
         DatabaseManager.createDatabase();
 
         try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
+            for (String statement : CREATE_STATEMENTS) {
                 try (PreparedStatement ps = conn.prepareStatement(statement)) {
                     ps.executeUpdate();
                 }
