@@ -1,5 +1,8 @@
 package dataaccess.sql;
 
+import dataaccess.*;
+import java.sql.*;
+
 public class SQLDatabase {
 
     private static final String[] createStatements = {
@@ -29,4 +32,18 @@ public class SQLDatabase {
             )
             """
     };
+
+    public static void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                    ps.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Unable to configure database", ex);
+        }
+    }
 }
