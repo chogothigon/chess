@@ -1,6 +1,9 @@
 package dataaccess.sql;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import dataaccess.*;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,4 +101,19 @@ class SQLGameDAOTest {
 
         assertTrue(gameDAO.listGames().isEmpty());
     }
+
+
+    @Test
+    void saveGameAfterMove() throws DataAccessException, InvalidMoveException {
+        var chessGame = new ChessGame();
+        chessGame.makeMove(new ChessMove(new ChessPosition(2, 5), new ChessPosition(4, 5), null));
+
+        var game = new GameData(0, null, null, "Test Game", chessGame);
+        var result = gameDAO.createGame(game);
+        var stored = gameDAO.getGame(result.gameID());
+
+        assertEquals(chessGame.getBoard(), stored.game().getBoard());
+        assertEquals(chessGame.getTeamTurn(), stored.game().getTeamTurn());
+    }
+
 }

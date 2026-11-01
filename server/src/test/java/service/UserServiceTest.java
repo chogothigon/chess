@@ -25,6 +25,8 @@ class UserServiceTest {
         var result = service.register(user);
         var storedUser = userDAO.getUser("ryan");
 
+        assertNotNull(result.authToken());
+        assertEquals(result, authDAO.getAuth(result.authToken()));
         assertEquals(user.username(), storedUser.username());
         assertEquals(user.email(), storedUser.email());
         assertNotEquals(user.password(), storedUser.password());
