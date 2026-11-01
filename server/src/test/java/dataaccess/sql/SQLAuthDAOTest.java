@@ -1,4 +1,3 @@
-
 package dataaccess.sql;
 
 import dataaccess.*;
@@ -8,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SQLAuthDAOTest {
-    private final AuthDAO authDAO = new SqlAuthDAO();
+    private final AuthDAO authDAO = new SQLAuthDAO();
 
     @BeforeEach
     void clear() throws DataAccessException {
