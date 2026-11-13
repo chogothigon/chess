@@ -1,10 +1,13 @@
 package ui;
 
 import java.util.Scanner;
+import client.ServerFacade;
 
 public class ChessClient {
     private final Scanner scanner = new Scanner(System.in);
+    private final ServerFacade facade = new ServerFacade(8080);
     private boolean running = true;
+    private String authToken;
 
     public void run() {
         System.out.println("♕ Welcome to Chess. Sign in to start. ♕");
@@ -57,6 +60,7 @@ public class ChessClient {
         System.out.println("4. Print this message: \"h\", \"help\"");
     }
 
+
     private void login(String[] parts) {
         if (parts.length != 3) {
             System.out.println("Usage: login <USERNAME> <PASSWORD>");
@@ -66,7 +70,15 @@ public class ChessClient {
         String username = parts[1];
         String password = parts[2];
 
-        System.out.println("Login command received for " + username);
+        try {
+            var result = facade.login(username, password);
+            authToken = result.authToken();
+
+            System.out.println("Successfully logged in as " + result.username());
+
+        } catch (RuntimeException e) {
+            System.out.println("Login failed: " + e.getMessage());
+        }
     }
 
     private void register(String[] parts) {
@@ -79,6 +91,14 @@ public class ChessClient {
         String password = parts[2];
         String email = parts[3];
 
-        System.out.println("Registration command received for " + username);
+        try {
+            var result = facade.register(username, password, email);
+            authToken = result.authToken();
+
+            System.out.println("Successfully registered as " + result.username());
+
+        } catch (RuntimeException e) {
+            System.out.println("Registration failed: " + e.getMessage());
+        }
     }
 }
