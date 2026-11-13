@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.AuthData;
 import model.UserData;
 
@@ -87,6 +88,35 @@ public class ServerFacade {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Logout was interrupted.", e);
+        }
+    }
+
+    public int createGame(String authToken, String gameName) {
+        var game = new JsonObject();
+        game.addProperty("gameName", gameName);
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("Content-Type", "application/json")
+                .header("authorization", authToken)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(game)))
+                .build();
+
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Could not create game.");
+            }
+
+            var result = gson.fromJson(response.body(), JsonObject.class);
+            return result.get("gameID").getAsInt();
+
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Could not connect to the chess server.", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Creating game was interrupted.", e);
         }
     }
 }
