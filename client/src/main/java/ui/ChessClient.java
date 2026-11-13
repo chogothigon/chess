@@ -1,7 +1,7 @@
 package ui;
 
-import java.util.Scanner;
 import client.ServerFacade;
+import java.util.Scanner;
 
 public class ChessClient {
     private final Scanner scanner = new Scanner(System.in);
@@ -23,11 +23,17 @@ public class ChessClient {
             String input = scanner.nextLine().trim();
 
             if (input.isEmpty()) {
+                System.out.println("Invalid command.");
                 continue;
             }
 
             String[] parts = input.split("\\s+");
             String command = parts[0].toLowerCase();
+
+            if (authToken != null) {
+                handlePostlogin(command, parts);
+                continue;
+            }
 
             switch (command) {
                 case "1", "l", "login":
@@ -60,6 +66,53 @@ public class ChessClient {
         System.out.println("4. Print this message: \"h\", \"help\"");
     }
 
+    private void printPostloginMenu() {
+        System.out.println();
+        System.out.println("Options:");
+        System.out.println("List current games: \"l\", \"list\"");
+        System.out.println("Create a new game: \"c\", \"create\" <GAME NAME>");
+        System.out.println("Join a game: \"j\", \"join\" <GAME ID> <COLOR>");
+        System.out.println("Watch a game: \"w\", \"watch\" <GAME ID>");
+        System.out.println("Logout: \"logout\"");
+    }
+
+    private void handlePostlogin(String command, String[] parts) {
+        switch (command) {
+            case "l", "list":
+                System.out.println("List games selected");
+                break;
+            case "c", "create":
+                System.out.println("Create game selected");
+                break;
+            case "j", "join":
+                System.out.println("Join game selected");
+                break;
+            case "w", "watch":
+                System.out.println("Watch game selected");
+                break;
+            case "logout":
+                try {
+                    facade.logout(authToken);
+                    authToken = null;
+
+                    System.out.println("Successfully logged out.");
+                    printPreloginMenu();
+
+                } catch (RuntimeException e) {
+                    System.out.println("Logout failed: " + e.getMessage());
+                }
+                break;
+            case "h", "help":
+                printPostloginMenu();
+                break;
+            case "q", "quit":
+                running = false;
+                break;
+            default:
+                System.out.println("Invalid command.");
+                break;
+        }
+    }
 
     private void login(String[] parts) {
         if (parts.length != 3) {
@@ -75,6 +128,7 @@ public class ChessClient {
             authToken = result.authToken();
 
             System.out.println("Successfully logged in as " + result.username());
+            printPostloginMenu();
 
         } catch (RuntimeException e) {
             System.out.println("Login failed: " + e.getMessage());
@@ -96,6 +150,7 @@ public class ChessClient {
             authToken = result.authToken();
 
             System.out.println("Successfully registered as " + result.username());
+            printPostloginMenu();
 
         } catch (RuntimeException e) {
             System.out.println("Registration failed: " + e.getMessage());
