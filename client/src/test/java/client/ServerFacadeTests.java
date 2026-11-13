@@ -53,4 +53,19 @@ public class ServerFacadeTests {
         assertEquals("player1", result.username());
         assertNotNull(result.authToken());
     }
+
+    @Test
+    void logoutSuccess() throws DataAccessException {
+        var auth = facade.register("player1", "password", "test@gmail.com");
+
+        facade.logout(auth.authToken());
+
+        assertNull(new SQLAuthDAO().getAuth(auth.authToken()));
+    }
+
+    @Test
+    void logoutInvalidToken() {
+        assertThrows(RuntimeException.class,
+                () -> facade.logout("invalidToken"));
+    }
 }
