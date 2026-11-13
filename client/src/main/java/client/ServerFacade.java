@@ -43,4 +43,25 @@ public class ServerFacade {
             throw new RuntimeException("Registration was interrupted.", e);
         }
     }
+
+    public AuthData login(String username, String password) {
+        var user = new UserData(username, password, null);
+        var request = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/session")).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(gson.toJson(user))).build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Login failed.");
+            }
+
+            return gson.fromJson(response.body(), AuthData.class);
+
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Could not connect to the chess server.", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Login was interrupted.", e);
+        }
+    }
+
 }

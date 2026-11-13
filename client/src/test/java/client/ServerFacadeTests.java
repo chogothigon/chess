@@ -33,13 +33,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
-
     @Test
     void registerSuccess() {
         var result = facade.register("player1", "password", "test@gmail.com");
