@@ -92,4 +92,49 @@ public class ServerFacadeTests {
         assertEquals("Game One", games[0].gameName());
         assertEquals("Game Two", games[1].gameName());
     }
+
+    @Test
+    void listGamesInvalidToken() {
+        assertThrows(RuntimeException.class, () -> facade.listGames("invalidToken"));
+    }
+
+    @Test
+    void joinGameSuccess() throws DataAccessException {
+        var auth = facade.register("player1", "password", "test@gmail.com");
+        int gameID = facade.createGame(auth.authToken(), "Test Game");
+
+        facade.joinGame(auth.authToken(), gameID, "WHITE");
+
+        var game = new SQLGameDAO().getGame(gameID);
+
+        assertEquals("player1", game.whiteUsername());
+        assertNull(game.blackUsername());
+    }
+
+    @Test
+    void joinGameInvalidToken() {
+        var auth = facade.register("player1", "password", "test@gmail.com");
+        int gameID = facade.createGame(auth.authToken(), "Test Game");
+
+        assertThrows(RuntimeException.class, () -> facade.joinGame("invalidToken", gameID, "WHITE"));
+    }
+
+    @Test
+    void joinGameInvalidGame() {
+        var auth = facade.register("player1", "password", "test@gmail.com");
+
+        assertThrows(RuntimeException.class, () -> facade.joinGame(auth.authToken(), -1, "WHITE"));
+    }
+
+    @Test
+    void joinGameOccupied() {
+        var player1 = facade.register("player1", "password", "test1@gmail.com");
+        var player2 = facade.register("player2", "password", "test2@gmail.com");
+
+        int gameID = facade.createGame(player1.authToken(), "Test Game");
+
+        facade.joinGame(player1.authToken(), gameID, "WHITE");
+
+        assertThrows(RuntimeException.class, () -> facade.joinGame(player2.authToken(), gameID, "WHITE"));
+    }
 }

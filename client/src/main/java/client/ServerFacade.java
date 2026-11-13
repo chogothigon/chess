@@ -145,4 +145,31 @@ public class ServerFacade {
             throw new RuntimeException("Listing games was interrupted.", e);
         }
     }
+
+    public void joinGame(String authToken, int gameID, String playerColor) {
+        var game = new JsonObject();
+        game.addProperty("gameID", gameID);
+        game.addProperty("playerColor", playerColor);
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("Content-Type", "application/json")
+                .header("authorization", authToken)
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(game)))
+                .build();
+
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Could not join game.");
+            }
+
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Could not connect to the chess server.", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Joining game was interrupted.", e);
+        }
+    }
 }
