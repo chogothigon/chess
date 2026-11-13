@@ -46,4 +46,11 @@ public class ServerFacadeTests {
         assertThrows(RuntimeException.class, () -> facade.register("player1", "password", "test@gmail.com"));
     }
 
+    @Test
+    void loginSuccess() {
+        facade.register("player1", "password", "test@gmail.com");
+        var result = facade.login("player1", "password");
+        assertEquals("player1", result.username());
+        assertNotNull(result.authToken());
+    }
 }
