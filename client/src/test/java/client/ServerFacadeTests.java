@@ -145,4 +145,18 @@ public class ServerFacadeTests {
 
         assertThrows(RuntimeException.class, () -> facade.joinGame(player2.authToken(), gameID, "WHITE"));
     }
+
+    @Test
+    void requestInterrupted() {
+        Thread.currentThread().interrupt();
+
+        try {
+            RuntimeException error = assertThrows(RuntimeException.class, () -> facade.listGames("invalidToken"));
+            assertEquals("Request was interrupted.", error.getMessage());
+            assertTrue(Thread.currentThread().isInterrupted());
+
+        } finally {
+            Thread.interrupted();
+        }
+    }
 }
