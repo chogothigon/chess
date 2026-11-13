@@ -73,4 +73,23 @@ public class ServerFacadeTests {
         assertTrue(gameID > 0);
         assertEquals("First Game", new SQLGameDAO().getGame(gameID).gameName());
     }
+
+    @Test
+    void createGameInvalidToken() {
+        assertThrows(RuntimeException.class, () -> facade.createGame("invalidToken", "Test Game"));
+    }
+
+    @Test
+    void listGamesSuccess() {
+        var auth = facade.register("player1", "password", "test@gmail.com");
+
+        facade.createGame(auth.authToken(), "Game One");
+        facade.createGame(auth.authToken(), "Game Two");
+
+        var games = facade.listGames(auth.authToken());
+
+        assertEquals(2, games.length);
+        assertEquals("Game One", games[0].gameName());
+        assertEquals("Game Two", games[1].gameName());
+    }
 }

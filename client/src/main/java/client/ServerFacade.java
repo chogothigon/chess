@@ -3,6 +3,7 @@ package client;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.net.URI;
@@ -117,6 +118,31 @@ public class ServerFacade {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Creating game was interrupted.", e);
+        }
+    }
+
+    public GameData[] listGames(String authToken) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/game"))
+                .header("authorization", authToken)
+                .GET()
+                .build();
+
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Could not list games.");
+            }
+
+            var result = gson.fromJson(response.body(), JsonObject.class);
+            return gson.fromJson(result.get("games"), GameData[].class);
+
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Could not connect to the chess server.", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Listing games was interrupted.", e);
         }
     }
 }
