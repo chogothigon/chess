@@ -245,6 +245,9 @@ public class ChessClient {
             facade.joinGame(authToken, gameID, color);
             System.out.println("Joined " + listedGames[gameNumber - 1].gameName() + " as " + color);
 
+            BoardRenderer renderer = new BoardRenderer();
+            renderer.drawBoard(color.equals("BLACK"));
+
         } catch (RuntimeException e) {
             System.out.println("Could not join game: " + e.getMessage());
         }
@@ -274,6 +277,6 @@ public class ChessClient {
 
         System.out.println("Watching game: " + game.gameName());
         BoardRenderer renderer = new BoardRenderer();
-        renderer.drawBoard();
+        renderer.drawBoard(false);
     }
 }
