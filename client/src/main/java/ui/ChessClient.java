@@ -90,7 +90,7 @@ public class ChessClient {
                 createGame(parts);
                 break;
             case "j", "join":
-                System.out.println("Join game selected");
+                joinGame(parts);
                 break;
             case "w", "watch":
                 System.out.println("Watch game selected");
@@ -209,6 +209,44 @@ public class ChessClient {
         } catch (RuntimeException e) {
             listedGames = new GameData[0];
             System.out.println("Could not list games: " + e.getMessage());
+        }
+    }
+
+    private void joinGame(String[] parts) {
+        if (parts.length != 3) {
+            System.out.println("Usage: join <GAME NUMBER> <COLOR>");
+            return;
+        }
+
+        int gameNumber;
+
+        try {
+            gameNumber = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            System.out.println("Game number must be a number.");
+            return;
+        }
+
+        if (gameNumber < 1 || gameNumber > listedGames.length) {
+            System.out.println("Invalid game number. Use list to see available games.");
+            return;
+        }
+
+        String color = parts[2].toUpperCase();
+
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
+            System.out.println("Color must be WHITE or BLACK.");
+            return;
+        }
+
+        int gameID = listedGames[gameNumber - 1].gameID();
+
+        try {
+            facade.joinGame(authToken, gameID, color);
+            System.out.println("Joined " + listedGames[gameNumber - 1].gameName() + " as " + color);
+
+        } catch (RuntimeException e) {
+            System.out.println("Could not join game: " + e.getMessage());
         }
     }
 }
