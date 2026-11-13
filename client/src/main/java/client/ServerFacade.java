@@ -108,9 +108,30 @@ public class ServerFacade {
         }
     }
 
+
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) {
         if (response.statusCode() != 200) {
-            throw new RuntimeException("Request failed.");
+            String message;
+
+            switch (response.statusCode()) {
+                case 400:
+                    message = "Invalid request.";
+                    break;
+                case 401:
+                    message = "You are not authorized.";
+                    break;
+                case 403:
+                    message = "Action not allowed. The position may already be taken.";
+                    break;
+                case 404:
+                    message = "Game not found.";
+                    break;
+                default:
+                    message = "Something went wrong with the request.";
+                    break;
+            }
+
+            throw new RuntimeException(message);
         }
 
         if (responseClass == null) {

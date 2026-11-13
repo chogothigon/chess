@@ -46,10 +46,14 @@ public class ChessClient {
                     register(parts);
                     break;
                 case "q", "quit":
-                    running = false;
+                    if (validNoArgs(parts)) {
+                        running = false;
+                    }
                     break;
                 case "h", "help":
-                    printPreloginMenu();
+                    if (validNoArgs(parts)) {
+                        printPreloginMenu();
+                    }
                     break;
                 default:
                     System.out.println("Invalid command.");
@@ -66,25 +70,27 @@ public class ChessClient {
         System.out.println("Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>");
         System.out.println("Register a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
         System.out.println("Exit the program: \"q\", \"quit\"");
-        System.out.println("Print this message: \"h\", \"help\"");
+        System.out.println("Show options: \"h\", \"help\"");
     }
 
     private void printPostloginMenu() {
         System.out.println();
         System.out.println("Options:");
-        System.out.println("List current games: \"l\", \"list\"");
-        System.out.println("Create a new game: \"c\", \"create\" <GAME NAME>");
+        System.out.println("List current games: \"ls\", \"list\"");
+        System.out.println("Create a new game: \"c\", \"create\" <GAME_NAME>");
         System.out.println("Join a game: \"j\", \"join\" <GAME NUMBER> <COLOR>");
         System.out.println("Watch a game: \"w\", \"watch\" <GAME NUMBER>");
-        System.out.println("Logout: \"logout\"");
+        System.out.println("Logout: \"l\", \"logout\"");
+        System.out.println("Show options: \"h\", \"help\"");
         System.out.println("Exit the program: \"q\", \"quit\"");
-        System.out.println("Print this message: \"h\", \"help\"");
     }
 
     private void handlePostlogin(String command, String[] parts) {
         switch (command) {
-            case "l", "list":
-                listGames();
+            case "ls", "list":
+                if (validNoArgs(parts)) {
+                    listGames();
+                }
                 break;
             case "c", "create":
                 createGame(parts);
@@ -95,23 +101,20 @@ public class ChessClient {
             case "w", "watch":
                 watchGame(parts);
                 break;
-            case "logout":
-                try {
-                    facade.logout(authToken);
-                    authToken = null;
-
-                    System.out.println("Successfully logged out.");
-                    printPreloginMenu();
-
-                } catch (RuntimeException e) {
-                    System.out.println("Logout failed: " + e.getMessage());
+            case "l", "logout":
+                if (validNoArgs(parts)) {
+                    logout(parts);
                 }
                 break;
             case "h", "help":
-                printPostloginMenu();
+                if (validNoArgs(parts)) {
+                    printPostloginMenu();
+                }
                 break;
             case "q", "quit":
-                running = false;
+                if (validNoArgs(parts)) {
+                    running = false;
+                }
                 break;
             default:
                 System.out.println("Invalid command.");
@@ -278,5 +281,32 @@ public class ChessClient {
         System.out.println("Watching game: " + game.gameName());
         BoardRenderer renderer = new BoardRenderer();
         renderer.drawBoard(false);
+    }
+
+    private void logout(String[] parts) {
+        if (!validNoArgs(parts)) {
+            return;
+        }
+
+        try {
+            facade.logout(authToken);
+            authToken = null;
+            listedGames = new GameData[0];
+
+            System.out.println("Successfully logged out.");
+            printPreloginMenu();
+
+        } catch (RuntimeException e) {
+            System.out.println("Logout failed: " + e.getMessage());
+        }
+    }
+
+    private boolean validNoArgs(String[] parts) {
+        if (parts.length != 1) {
+            System.out.println("This command does not take any arguments.");
+            return false;
+        }
+
+        return true;
     }
 }
