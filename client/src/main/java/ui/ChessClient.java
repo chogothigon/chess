@@ -82,7 +82,7 @@ public class ChessClient {
                 System.out.println("List games selected");
                 break;
             case "c", "create":
-                System.out.println("Create game selected");
+                createGame(parts);
                 break;
             case "j", "join":
                 System.out.println("Join game selected");
@@ -154,6 +154,22 @@ public class ChessClient {
 
         } catch (RuntimeException e) {
             System.out.println("Registration failed: " + e.getMessage());
+        }
+    }
+
+    private void createGame(String[] parts) {
+        if (parts.length != 2) {
+            System.out.println("Usage: create <GAME_NAME> (no spaces)");
+            return;
+        }
+
+        String gameName = parts[1];
+
+        try {
+            facade.createGame(authToken, gameName);
+            System.out.println("Successfully created game: " + gameName);
+        } catch (RuntimeException e) {
+            System.out.println("Could not create game: " + e.getMessage());
         }
     }
 }
