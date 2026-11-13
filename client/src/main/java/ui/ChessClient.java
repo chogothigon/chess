@@ -8,19 +8,30 @@ public class ChessClient {
 
     public void run() {
         System.out.println("♕ Welcome to Chess. Sign in to start. ♕");
+        printPreloginMenu();
 
         while (running) {
-            printPreloginMenu();
             System.out.print("Enter command: ");
 
-            String input = scanner.nextLine().trim().toLowerCase();
+            if (!scanner.hasNextLine()) {
+                break;
+            }
 
-            switch (input) {
+            String input = scanner.nextLine().trim();
+
+            if (input.isEmpty()) {
+                continue;
+            }
+
+            String[] parts = input.split("\\s+");
+            String command = parts[0].toLowerCase();
+
+            switch (command) {
                 case "1", "l", "login":
-                    System.out.println("Login selected");
+                    login(parts);
                     break;
                 case "2", "r", "register":
-                    System.out.println("Register selected");
+                    register(parts);
                     break;
                 case "3", "q", "quit":
                     running = false;
@@ -44,5 +55,30 @@ public class ChessClient {
         System.out.println("2. Register a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
         System.out.println("3. Exit the program: \"q\", \"quit\"");
         System.out.println("4. Print this message: \"h\", \"help\"");
+    }
+
+    private void login(String[] parts) {
+        if (parts.length != 3) {
+            System.out.println("Usage: login <USERNAME> <PASSWORD>");
+            return;
+        }
+
+        String username = parts[1];
+        String password = parts[2];
+
+        System.out.println("Login command received for " + username);
+    }
+
+    private void register(String[] parts) {
+        if (parts.length != 4) {
+            System.out.println("Usage: register <USERNAME> <PASSWORD> <EMAIL>");
+            return;
+        }
+
+        String username = parts[1];
+        String password = parts[2];
+        String email = parts[3];
+
+        System.out.println("Registration command received for " + username);
     }
 }
