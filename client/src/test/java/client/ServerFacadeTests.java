@@ -2,6 +2,9 @@ package client;
 
 import org.junit.jupiter.api.*;
 import server.Server;
+import dataaccess.*;
+import dataaccess.sql.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -18,6 +21,13 @@ public class ServerFacadeTests {
         facade = new ServerFacade(port);
     }
 
+    @BeforeEach
+    void clearDatabase() throws DataAccessException {
+        new SQLAuthDAO().clear();
+        new SQLGameDAO().clear();
+        new SQLUserDAO().clear();
+    }
+
     @AfterAll
     static void stopServer() {
         server.stop();
@@ -27,6 +37,20 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
+    }
+
+
+    @Test
+    void registerSuccess() {
+        var result = facade.register("player1", "password", "test@gmail.com");
+        assertEquals("player1", result.username());
+        assertNotNull(result.authToken());
+    }
+
+    @Test
+    void registerDuplicate() {
+        facade.register("player1", "password", "test@gmail.com");
+        assertThrows(RuntimeException.class, () -> facade.register("player1", "password", "test@gmail.com"));
     }
 
 }
