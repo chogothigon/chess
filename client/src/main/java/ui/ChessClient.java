@@ -1,6 +1,8 @@
 package ui;
 
 import client.ServerFacade;
+import model.GameData;
+
 import java.util.Scanner;
 
 public class ChessClient {
@@ -8,6 +10,7 @@ public class ChessClient {
     private final ServerFacade facade = new ServerFacade(8080);
     private boolean running = true;
     private String authToken;
+    private GameData[] listedGames = new GameData[0];
 
     public void run() {
         System.out.println("♕ Welcome to Chess. Sign in to start. ♕");
@@ -36,16 +39,16 @@ public class ChessClient {
             }
 
             switch (command) {
-                case "1", "l", "login":
+                case "l", "login":
                     login(parts);
                     break;
-                case "2", "r", "register":
+                case "r", "register":
                     register(parts);
                     break;
-                case "3", "q", "quit":
+                case "q", "quit":
                     running = false;
                     break;
-                case "4", "h", "help":
+                case "h", "help":
                     printPreloginMenu();
                     break;
                 default:
@@ -60,10 +63,10 @@ public class ChessClient {
     private void printPreloginMenu() {
         System.out.println();
         System.out.println("Options:");
-        System.out.println("1. Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>");
-        System.out.println("2. Register a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
-        System.out.println("3. Exit the program: \"q\", \"quit\"");
-        System.out.println("4. Print this message: \"h\", \"help\"");
+        System.out.println("Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>");
+        System.out.println("Register a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
+        System.out.println("Exit the program: \"q\", \"quit\"");
+        System.out.println("Print this message: \"h\", \"help\"");
     }
 
     private void printPostloginMenu() {
@@ -71,15 +74,17 @@ public class ChessClient {
         System.out.println("Options:");
         System.out.println("List current games: \"l\", \"list\"");
         System.out.println("Create a new game: \"c\", \"create\" <GAME NAME>");
-        System.out.println("Join a game: \"j\", \"join\" <GAME ID> <COLOR>");
-        System.out.println("Watch a game: \"w\", \"watch\" <GAME ID>");
+        System.out.println("Join a game: \"j\", \"join\" <GAME NUMBER> <COLOR>");
+        System.out.println("Watch a game: \"w\", \"watch\" <GAME NUMBER>");
         System.out.println("Logout: \"logout\"");
+        System.out.println("Exit the program: \"q\", \"quit\"");
+        System.out.println("Print this message: \"h\", \"help\"");
     }
 
     private void handlePostlogin(String command, String[] parts) {
         switch (command) {
             case "l", "list":
-                System.out.println("List games selected");
+                listGames();
                 break;
             case "c", "create":
                 createGame(parts);
@@ -170,6 +175,40 @@ public class ChessClient {
             System.out.println("Successfully created game: " + gameName);
         } catch (RuntimeException e) {
             System.out.println("Could not create game: " + e.getMessage());
+        }
+    }
+
+    private void listGames() {
+        try {
+            listedGames = facade.listGames(authToken);
+
+            if (listedGames.length == 0) {
+                System.out.println("There are no games available.");
+                return;
+            }
+
+            System.out.println("Current Games:");
+
+            for (int i = 0; i < listedGames.length; i++) {
+                GameData game = listedGames[i];
+
+                String white = game.whiteUsername();
+                String black = game.blackUsername();
+
+                if (white == null) {
+                    white = "Available";
+                }
+
+                if (black == null) {
+                    black = "Available";
+                }
+
+                System.out.println((i + 1) + ". " + game.gameName() + " | White: " + white + " | Black: " + black);
+            }
+
+        } catch (RuntimeException e) {
+            listedGames = new GameData[0];
+            System.out.println("Could not list games: " + e.getMessage());
         }
     }
 }
