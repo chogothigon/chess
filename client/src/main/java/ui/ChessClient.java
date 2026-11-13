@@ -93,7 +93,7 @@ public class ChessClient {
                 joinGame(parts);
                 break;
             case "w", "watch":
-                System.out.println("Watch game selected");
+                watchGame(parts);
                 break;
             case "logout":
                 try {
@@ -248,5 +248,30 @@ public class ChessClient {
         } catch (RuntimeException e) {
             System.out.println("Could not join game: " + e.getMessage());
         }
+    }
+
+    private void watchGame(String[] parts) {
+        if (parts.length != 2) {
+            System.out.println("Usage: watch <GAME NUMBER>");
+            return;
+        }
+
+        int gameNumber;
+
+        try {
+            gameNumber = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            System.out.println("Game number must be a number.");
+            return;
+        }
+
+        if (gameNumber < 1 || gameNumber > listedGames.length) {
+            System.out.println("Invalid game number. Use list to see available games.");
+            return;
+        }
+
+        var game = listedGames[gameNumber - 1];
+
+        System.out.println("Watching game: " + game.gameName());
     }
 }
