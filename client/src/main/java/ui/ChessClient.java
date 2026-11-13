@@ -273,5 +273,7 @@ public class ChessClient {
         var game = listedGames[gameNumber - 1];
 
         System.out.println("Watching game: " + game.gameName());
+        BoardRenderer renderer = new BoardRenderer();
+        renderer.drawBoard();
     }
 }
